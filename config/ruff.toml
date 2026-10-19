@@ -1,0 +1,35 @@
+# ==============================================================================
+# Ruff Configuration: High-Performance Python Linter & Anti-Slop (2026)
+# ==============================================================================
+
+target-version = "py311"
+line-length = 100
+
+[lint]
+# Select rules:
+# E/W: pycodestyle
+# F: Pyflakes (unused imports, undefined variables)
+# C90: McCabe Cyclomatic Complexity (AI spaghetti functions)
+# B: flake8-bugbear (common AI bug patterns, default mutable arguments)
+# SIM: flake8-simplify (nested ternaries, redundant if-else)
+# PL: Pylint rules
+# RET: Return statement checks
+select = ["E", "F", "W", "C90", "B", "SIM", "PL", "RET"]
+
+# Ignore line length in docstrings
+ignore = ["E501"]
+
+[lint.mccabe]
+# Flag functions with cyclomatic complexity > 15 (typical in AI-generated spaghetti)
+max-complexity = 15
+
+[lint.pylint]
+# Disallow functions with more than 5 return statements
+max-returns = 5
+# Disallow functions with more than 6 branch statements
+max-branches = 6
+
+[format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"

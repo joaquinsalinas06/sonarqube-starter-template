@@ -1,0 +1,83 @@
+name: 🛡️ Anti-Slop Suite (TypeScript & Python)
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+jobs:
+  anti-slop-gate:
+    name: 🔍 Anti-Slop Detection & Quality Gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ------------------------------------------------------------------------
+      # Setup Python & Ruff
+      # ------------------------------------------------------------------------
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python Anti-Slop Tools (Ruff & AI-SLOP-Detector)
+        run: |
+          pip install --upgrade ruff ai-slop-detector
+
+      # ------------------------------------------------------------------------
+      # Setup Node, Biome & jscpd
+      # ------------------------------------------------------------------------
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # ------------------------------------------------------------------------
+      # Step 1: Copy-Paste Detection (jscpd)
+      # ------------------------------------------------------------------------
+      - name: ✂️ Check Code Duplications (jscpd)
+        run: |
+          npx --yes jscpd --config config/.jscpd.json .
+
+      # ------------------------------------------------------------------------
+      # Step 2: Ultra-Fast Linters (Biome for TS + Ruff for Python)
+      # ------------------------------------------------------------------------
+      - name: ⚡ Lint Python (Ruff)
+        run: |
+          ruff check --config config/ruff.toml .
+
+      - name: ⚡ Lint TypeScript (Biome)
+        run: |
+          npx --yes @biomejs/biome check --config-path=config/ src/ || true
+
+      # ------------------------------------------------------------------------
+      # Step 3: AI-SLOP-Detector Gate
+      # ------------------------------------------------------------------------
+      - name: 🤖 AI-SLOP-Detector Gate
+        run: |
+          slop-detector --project . --js --cross-file --gate --no-color --no-history || true
+
+      # ------------------------------------------------------------------------
+      # Step 4: SonarQube Deep Semantic Analysis
+      # ------------------------------------------------------------------------
+      - name: 🛡️ SonarQube Scan
+        if: env.SONAR_TOKEN != ''
+        uses: SonarSource/sonarqube-scan-action@v4
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          projectBaseDir: .
+          args: >
+            -Dproject.settings=config/sonar-project.properties

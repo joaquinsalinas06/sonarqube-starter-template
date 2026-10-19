@@ -1,0 +1,14 @@
+{
+  "$schema": "https://raw.githubusercontent.com/plantain-00/type-coverage/master/schema.json",
+  "atLeast": 85,
+  "strict": true,
+  "detail": true,
+  "ignoreCatch": true,
+  "ignoreFiles": [
+    "**/*.d.ts",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    ".next/**",
+    "node_modules/**"
+  ]
+}

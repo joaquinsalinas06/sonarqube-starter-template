@@ -1,0 +1,39 @@
+# ==============================================================================
+# AI-SLOP-Detector Configuration (2026)
+# Targets AI-generated stubs, empty handlers, type bypasses, and fake code
+# ==============================================================================
+
+version: "3.10"
+
+# Target languages
+languages:
+  - python
+  - javascript
+  - typescript
+
+# Path exclusions
+exclude:
+  - "**/node_modules/**"
+  - "**/.next/**"
+  - "**/dist/**"
+  - "**/build/**"
+  - "**/coverage/**"
+  - "**/.venv/**"
+  - "**/venv/**"
+  - "**/__pycache__/**"
+  - "src/types/database.types.ts"
+  - "src/components/ui/**"
+
+# Slop detection thresholds
+thresholds:
+  fail_deficit_score: 50.0       # Fail gate if weighted deficit > 50
+  max_any_per_file: 5            # Flag files with excessive 'any' usage
+  min_logic_density_ratio: 0.60  # Minimum 60% real logic lines (vs comments/stubs)
+
+# Rule enforcement
+rules:
+  empty_stubs: error             # Disallow 'pass' or empty functions
+  swallowed_exceptions: error    # Disallow 'except Exception: pass' or 'catch(e) {}'
+  untyped_any_bypass: warn       # Warn on excessive 'as any'
+  ghost_imports: error           # Disallow unused imports
+  inflated_comments: warn        # Warn when comment-to-code ratio exceeds healthy limits

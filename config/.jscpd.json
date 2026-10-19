@@ -7,10 +7,13 @@
     "**/build/**",
     "**/.next/**",
     "**/coverage/**",
+    "**/.venv/**",
+    "**/venv/**",
+    "**/__pycache__/**",
     "src/types/database.types.ts",
     "src/components/ui/**"
   ],
-  "format": ["javascript", "typescript", "jsx", "tsx"],
+  "format": ["javascript", "typescript", "jsx", "tsx", "python"],
   "minLines": 5,
   "minTokens": 50,
   "output": ".jscpd/"

@@ -1,0 +1,37 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": [
+    "src/index.{js,ts,tsx}",
+    "src/app/**/*.{js,ts,tsx}",
+    "src/pages/**/*.{js,ts,tsx}",
+    "app/**/*.{js,ts,tsx}",
+    "pages/**/*.{js,ts,tsx}"
+  ],
+  "project": [
+    "src/**/*.{js,ts,tsx}",
+    "app/**/*.{js,ts,tsx}",
+    "components/**/*.{js,ts,tsx}",
+    "lib/**/*.{js,ts,tsx}"
+  ],
+  "ignore": [
+    "**/*.d.ts",
+    "**/*.test.{js,ts,tsx}",
+    "**/*.spec.{js,ts,tsx}",
+    ".next/**",
+    "out/**",
+    "node_modules/**"
+  ],
+  "ignoreDependencies": [
+    "sharp",
+    "@types/*"
+  ],
+  "rules": {
+    "files": "error",
+    "dependencies": "error",
+    "unlisted": "error",
+    "exports": "warn",
+    "types": "warn",
+    "nsExports": "warn",
+    "duplicates": "warn"
+  }
+}

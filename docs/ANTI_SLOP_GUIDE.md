@@ -1,57 +1,96 @@
-# Guía Definitiva de Prevención y Detección de "AI Slop" (TypeScript & Python)
+# Complete Anti-Slop & Quality Architecture (2026)
 
-En 2026, los asistentes de código generativo (Cursor, Claude Code, GitHub Copilot, Devin) aumentan la velocidad de desarrollo 5x, pero introducen una nueva categoría de deuda técnica conocida como **"AI Slop"**:
-- **Duplicaciones desmedidas**: La IA prefiere reescribir funciones auxiliares una y otra vez en vez de reutilizar abstracciones existentes.
-- **Evasión de tipos**: Elusión sistemática del tipado estricto mediante `any` o casts genéricos forzados.
-- **Stubs y código "falso-terminado"**: Funciones vacías (`pass` o `// TODO: implement later`) que parecen completas pero no ejecutan lógica.
-- **Captura ciega de excepciones**: Bloques `except Exception: pass` o `catch(e) {}` que enmascaran errores críticos en producción.
-- **Complejidad cognitiva inflada**: Bloques `if/else` y ternarios hiper-anidados con complejidad > 15.
-
-Esta suite unifica las herramientas más avanzadas de la industria para erradicar el AI Slop tanto en **TypeScript/JavaScript** como en **Python**.
+This document describes the multi-layered defense system implemented in this starter template to keep modern TypeScript and Python codebases clean, maintainable, secure, and free of AI-generated junk ("slop").
 
 ---
 
-## 1. El Arsenal de Herramientas Anti-Slop Integrado
+## The 8 Quality Layers
 
-| Herramienta | Lenguaje | Propósito Principal | Detección Clave |
-| :--- | :--- | :--- | :--- |
-| **`jscpd`** | TS, JS, Python | Detector de Duplicación (CPD) en milisegundos. | Encuentra clones exactos o casi-idénticos entre diferentes archivos. |
-| **`biome`** | TS, JS, JSX | Linter y formateador ultrarrápido en Rust (0.03s). | Atrapa `noExplicitAny`, complejidad cognitiva y formato roto. |
-| **`ruff`** | Python | Linter y formateador ultrarrápido en Rust (0.02s). | Atrapa excepciones tragadas, complejidad McCabe > 15 e imports fantasma. |
-| **`ai-slop-detector`** | TS, JS, Python | Analizador heurístico de código de IA. | Stubs vacíos, Logic Density Ratio (LDR) baja, dependencias desconectadas. |
-| **SonarQube Server** | 30+ Lenguajes | Gobernanza centralizada y Quality Gate. | Taint Analysis (OWASP), bugs semánticos y reglas "Clean as You Code". |
+```
+Layer 1: Duplication & Clones (jscpd)
+   └── Sub-second cross-file copy-paste detection
 
----
+Layer 2: Dead Code & Zombie Packages (Knip & Vulture/Deptry)
+   └── Pruning unused files, unexported functions, and abandoned npm/pip dependencies
 
-## 2. Ejecución Local de la Suite
+Layer 3: Framework-Specific Health (React Doctor)
+   └── React 19/Next.js memory leaks, state misuse, unhandled promise crashes
 
-Puedes correr toda la suite con un solo comando:
+Layer 4: High-Speed Rust Linters (Biome & Ruff)
+   └── Sub-30ms AST syntax, import sorting, and basic lint checks
 
-```bash
-# Analizar todo el repositorio (TypeScript + Python)
-./scripts/detect_slop.sh
+Layer 5: Type Strictness (type-coverage)
+   └── Eliminating "any-slop" and enforcing real type coverage (>85%)
 
-# Analizar solo TypeScript / JavaScript
-./scripts/detect_slop.sh --ts
+Layer 6: AI-Slop & Hallucination Gate (ai-slop-detector)
+   └── Catching empty stubs, fake returns, and low logic-to-LOC density
 
-# Analizar solo Python
-./scripts/detect_slop.sh --py
+Layer 7: Secret Detection & SAST Security (Gitleaks & Semgrep)
+   └── Blocking leaked Supabase service role keys and vulnerable dynamic calls
+
+Layer 8: Central Quality Gate & Historical Trends (SonarQube)
+   └── Inter-procedural dataflow analysis, Cognitive Complexity limits, PR decoration
 ```
 
 ---
 
-## 3. Integración en Pull Requests (CI/CD)
+## Tool Breakdown & Configuration Reference
 
-El archivo `templates/workflows/anti-slop-ci.yml` viene listo para ser usado en GitHub Actions:
-1. En cada Pull Request a `main` o `dev`, se dispara automáticamente el chequeo.
-2. Si un PR introduce duplicación > 3%, excepciones tragadas o stubs vacíos, el job alerta y bloquea el merge.
-3. Permite que el equipo mantenga la base de código limpia de forma totalmente automatizada.
+| Tool | Ecosystem | Config Location | What It Detects |
+| :--- | :--- | :--- | :--- |
+| **`jscpd`** | Universal | [`config/.jscpd.json`](file:///config/.jscpd.json) | Code clones across files (>5 lines or >50 tokens). |
+| **`knip`** | TS / JS / Next.js | [`config/knip.json`](file:///config/knip.json) | Unused files, unused exports, unused npm packages, missing dependencies. |
+| **`vulture`** | Python | [`config/.vulture_whitelist.py`](file:///config/.vulture_whitelist.py) | Unreachable Python functions, unused classes and attributes. |
+| **`deptry`** | Python | [`config/deptry.toml`](file:///config/deptry.toml) | Unused dependencies in `pyproject.toml` or `requirements.txt`. |
+| **`react-doctor`** | React / Next.js | [`config/.react-doctorrc.json`](file:///config/.react-doctorrc.json) | Leaked `createObjectURL`, promises without `finally`, array index keys. |
+| **`biome`** | TS / JS | [`config/biome.json`](file:///config/biome.json) | Formatting, import sorting, bad idioms. (Rust-speed: ~15ms). |
+| **`ruff`** | Python | [`config/ruff.toml`](file:///config/ruff.toml) | Complexity limits, bug patterns, Flake8 + Black replacement. |
+| **`type-coverage`**| TypeScript | [`config/type-coverage.json`](file:///config/type-coverage.json) | Implicit and explicit `any` usage; enforces typed codebase. |
+| **`ai-slop-detector`** | TS / JS / Python | [`config/.slopconfig.yaml`](file:///config/.slopconfig.yaml) | Mock implementations, empty catch blocks, hallucinated imports. |
+| **`gitleaks`** | Universal | [`config/.gitleaks.toml`](file:///config/.gitleaks.toml) | Leaked API keys, Supabase service roles, private tokens. |
+| **`semgrep`** | Universal | [`config/semgrep.yml`](file:///config/semgrep.yml) | Client-side service role imports, unsafe dynamic eval, XSS. |
+| **`SonarQube`** | Universal | [`config/sonar-project.properties`](file:///config/sonar-project.properties) | Cognitive complexity, dataflow bugs, Quality Gate blocker. |
 
 ---
 
-## 4. Archivos de Configuración Incluidos
+## Quick Execution
 
-- [`config/ruff.toml`](../config/ruff.toml): Reglas de complejidad McCabe y buenas prácticas para Python.
-- [`config/biome.json`](../config/biome.json): Reglas de tipado estricto y complejidad para TypeScript.
-- [`config/.jscpd.json`](../config/.jscpd.json): Umbral del 3% de duplicación para TS y Python.
-- [`config/.slopconfig.yaml`](../config/.slopconfig.yaml): Umbrales de densidad lógica y exclusiones para el detector de slop.
+### Run Everything Locally:
+```bash
+# Full scan (all layers)
+bash scripts/detect_slop.sh --all
+
+# TypeScript / Next.js only
+bash scripts/detect_slop.sh --ts
+
+# Python only
+bash scripts/detect_slop.sh --py
+```
+
+### Running Individual Layer Checks:
+```bash
+# Check dead code & zombie packages
+npx knip --config config/knip.json
+
+# Check React / Next.js health
+npx react-doctor src
+
+# Check copy-paste duplication
+npx jscpd --config config/.jscpd.json .
+
+# Check secrets
+gitleaks detect --config config/.gitleaks.toml
+
+# Check SAST security patterns
+semgrep scan --config config/semgrep.yml
+```
+
+---
+
+## CI/CD Pipeline Order
+
+In GitHub Actions, checks should be arranged from fastest to slowest:
+
+1. **Pre-commit / Fast Check (<5s)**: `biome` / `ruff` + `jscpd` + `gitleaks`
+2. **PR Gate (<30s)**: `knip` + `react-doctor` + `type-coverage` + `semgrep`
+3. **Server Gate (~1m)**: `SonarScanner` -> Local/Remote `SonarQube`

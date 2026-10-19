@@ -1,0 +1,56 @@
+name: Anti-Slop & Quality Gate (2026)
+
+on:
+  pull_request:
+    branches: [main, master, develop]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  anti-slop-audit:
+    name: Multi-Layer Anti-Slop & Quality Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js (v20)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Setup Python (v3.12)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python Quality Tools
+        run: |
+          pip install --upgrade ruff vulture deptry semgrep ai-slop-detector
+
+      - name: Run Secret Leak Scan (Gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        continue-on-error: true
+
+      - name: Run Unified Anti-Slop Suite
+        run: |
+          chmod +x scripts/detect_slop.sh
+          ./scripts/detect_slop.sh --all
+
+      - name: Upload Slop Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: anti-slop-reports
+          path: |
+            report/
+            .slop/
+          retention-days: 7

@@ -1,0 +1,25 @@
+{
+  "$schema": "https://react.doctor/schema.json",
+  "rules": {
+    "no-create-object-url-without-revoke": "error",
+    "no-loading-flag-reset-outside-finally": "error",
+    "no-array-index-as-key": "error",
+    "no-prevent-default": "warn",
+    "rerender-state-only-in-handlers": "warn",
+    "rerender-lazy-state-init": "warn",
+    "use-lazy-motion": "warn",
+    "no-locale-format-in-render": "warn",
+    "js-hoist-intl": "warn",
+    "no-giant-component": "warn",
+    "no-high-complexity-react-function": "warn",
+    "no-transition-all": "warn",
+    "control-has-associated-label": "warn",
+    "label-has-associated-control": "warn"
+  },
+  "ignore": [
+    ".next/**",
+    "node_modules/**",
+    "dist/**",
+    "build/**"
+  ]
+}

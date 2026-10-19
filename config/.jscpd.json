@@ -1,0 +1,17 @@
+{
+  "threshold": 3,
+  "reporters": ["console", "json"],
+  "ignore": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/.next/**",
+    "**/coverage/**",
+    "src/types/database.types.ts",
+    "src/components/ui/**"
+  ],
+  "format": ["javascript", "typescript", "jsx", "tsx"],
+  "minLines": 5,
+  "minTokens": 50,
+  "output": ".jscpd/"
+}

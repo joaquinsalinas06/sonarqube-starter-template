@@ -1,0 +1,47 @@
+rules:
+  - id: nextjs-client-supabase-service-role
+    languages: [typescript, javascript]
+    message: "CRITICAL: SUPABASE_SERVICE_ROLE_KEY or service client imported in client component. This bypasses Row Level Security and exposes all database tables."
+    severity: ERROR
+    patterns:
+      - pattern-either:
+          - pattern: import { createClient } from '@supabase/supabase-js'; ... process.env.SUPABASE_SERVICE_ROLE_KEY
+          - pattern: import { createClient } from '@supabase/supabase-js'; ... process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY
+
+  - id: react-dangerously-set-inner-html
+    languages: [typescript, javascript]
+    message: "WARNING: Use of dangerouslySetInnerHTML creates XSS vulnerabilities. Sanitize with DOMPurify."
+    severity: WARNING
+    patterns:
+      - pattern: dangerouslySetInnerHTML={{ __html: $X }}
+
+  - id: typescript-empty-catch-block
+    languages: [typescript, javascript]
+    message: "AI Slop Pattern: Empty catch block silently swallowing errors."
+    severity: WARNING
+    patterns:
+      - pattern: |
+          try {
+            ...
+          } catch ($E) {
+          }
+
+  - id: python-dangerous-eval-exec
+    languages: [python]
+    message: "CRITICAL: Dynamic code execution with eval() or exec() is vulnerable to Remote Code Execution."
+    severity: ERROR
+    patterns:
+      - pattern-either:
+          - pattern: eval(...)
+          - pattern: exec(...)
+
+  - id: python-bare-except-pass
+    languages: [python]
+    message: "AI Slop Pattern: Bare 'except: pass' silently swallowing runtime crashes."
+    severity: WARNING
+    patterns:
+      - pattern: |
+          try:
+              ...
+          except:
+              pass

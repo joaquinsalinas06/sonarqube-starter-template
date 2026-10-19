@@ -1,0 +1,30 @@
+# Gitleaks Configuration for Anti-Slop / Secret Leak Prevention
+title = "Gitleaks Anti-Slop Rules"
+
+[extend]
+# Extends default gitleaks rules
+
+[[rules]]
+id = "supabase-service-role-key"
+description = "Supabase Service Role Key (Bypasses RLS - NEVER commit to git)"
+regex = '''eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+'''
+keywords = ["supabase", "service_role"]
+
+[[rules]]
+id = "generic-api-key"
+description = "Generic High-Entropy Secret Key"
+regex = '''(?i)(?:api_key|apikey|secret|token|password|auth_token)\s*[:=]\s*["']([A-Za-z0-9_\-]{20,})["']'''
+keywords = ["api_key", "secret", "token"]
+
+[allowlist]
+description = "Allowlist test and dummy values"
+regexes = [
+  '''squ_[0-9a-f]{40}''', # Local dummy sonar tokens in docs
+  '''test_dummy_key''',
+  '''dummy_secret_value'''
+]
+paths = [
+  '''\.env\.example''',
+  '''tests?/.*''',
+  '''docs/.*'''
+]

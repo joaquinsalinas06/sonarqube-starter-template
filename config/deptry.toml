@@ -1,0 +1,22 @@
+# Deptry configuration - Checks Python dependency health
+# Detects:
+# 1. DEP001: Unused dependencies
+# 2. DEP002: Missing dependencies (imported but not in pyproject/requirements)
+# 3. DEP003: Transitive dependencies used directly
+# 4. DEP004: Misplaced dev dependencies
+
+[tool.deptry]
+ignore = ["DEP005"]
+exclude = [
+    ".venv",
+    "venv",
+    "tests",
+    "docs",
+    "build",
+    "dist"
+]
+
+[tool.deptry.per_rule_ignores]
+DEP001 = ["uvicorn", "gunicorn"] # Used as CLI runners, not direct imports
+DEP002 = []
+DEP004 = ["pytest", "ruff", "mypy", "vulture"]

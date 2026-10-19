@@ -1,0 +1,41 @@
+# ==============================================================================
+# Caddyfile: Automated HTTPS & Reverse Proxy for SonarQube
+# ==============================================================================
+
+{$SONAR_DOMAIN:localhost} {
+    # Automatic Let's Encrypt TLS registration
+    tls {$CADDY_LETSENCRYPT_EMAIL:internal}
+
+    # Security headers
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "SAMEORIGIN"
+        X-XSS-Protection "1; mode=block"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+
+    # Reverse proxy to SonarQube container
+    reverse_proxy sonarqube:9000 {
+        header_up Host {host}
+        header_up X-Real-IP {remote}
+        header_up X-Forwarded-For {remote}
+        header_up X-Forwarded-Proto {scheme}
+
+        # Generous timeout for large project scan report uploads
+        transport http {
+            response_header_timeout 600s
+            read_timeout 600s
+            write_timeout 600s
+        }
+    }
+
+    # Enable Gzip and Zstandard compression
+    encode zstd gzip
+
+    # Logging
+    log {
+        output stdout
+        format console
+    }
+}

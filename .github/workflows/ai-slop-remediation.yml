@@ -1,0 +1,67 @@
+name: 🤖 AI Slop Autonomous Remediation (2026)
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_branch:
+        description: 'Branch to analyze and remediate'
+        required: true
+        default: 'dev'
+      all_code:
+        description: 'Analyze overall code instead of New Code only?'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  extract-and-prepare-remediation:
+    name: 🧠 Extract SonarQube Issues & Build Remediation Context
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run Sonar AI Bridge
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_PROJECT_KEY: 'my-startup-project'
+        run: |
+          FLAGS="--branch=${{ github.event.inputs.target_branch }}"
+          if [ "${{ github.event.inputs.all_code }}" = "true" ]; then
+            FLAGS="$FLAGS --all-code"
+          fi
+          
+          python3 scripts/sonar_ai_bridge.py \
+            $FLAGS \
+            --format=markdown \
+            --output-file=remediation_report.md || true
+
+          python3 scripts/sonar_ai_bridge.py \
+            $FLAGS \
+            --format=prompt \
+            --output-file=ai_agent_prompt.txt || true
+
+      - name: Upload Remediation Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-slop-remediation-prompts
+          path: |
+            remediation_report.md
+            ai_agent_prompt.txt
+
+      - name: Display Generated Prompt Preview
+        run: |
+          echo "=========================================================="
+          echo "Generated AI Subagent Remediation Prompt Preview:"
+          echo "=========================================================="
+          cat ai_agent_prompt.txt | head -n 40

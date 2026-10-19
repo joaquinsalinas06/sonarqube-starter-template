@@ -1,0 +1,41 @@
+# Environment secrets
+freshit-reservas/
+.env
+docker/.env
+*.env.local
+
+# SonarQube Scanner local work directory
+.scannerwork/
+
+# Coverage and test reports
+coverage/
+.nyc_output/
+*.lcov
+*.xml
+
+# Dependencies & Build outputs
+node_modules/
+dist/
+build/
+.next/
+.nuxt/
+out/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+
+# OS and Editor temp files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.bak
+
+# Temporary backup dumps
+/opt/backups/
+*.sql.gz

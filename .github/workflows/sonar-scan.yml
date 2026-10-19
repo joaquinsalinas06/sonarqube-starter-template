@@ -1,0 +1,75 @@
+name: SonarQube Fast Quality Gate (2026)
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+  statuses: write
+
+jobs:
+  fast-lint:
+    name: ⚡ Fast Rust Linter (Biome)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Biome Linter
+        uses: biomejs/setup-biome@v2
+        continue-on-error: true # Non-blocking if project doesn't use JS/TS yet
+        with:
+          version: latest
+
+      - name: Run Biome Check (< 1 second)
+        continue-on-error: true
+        run: |
+          if [ -f "config/biome.json" ]; then
+            biome check --config-path=config/ src/ || echo "Biome lint completed with notices."
+          fi
+
+  sonar-analysis:
+    name: 🛡️ SonarQube Deep Semantic Analysis
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Deep checkout required for accurate blame and "Clean as You Code" diff
+      - name: Checkout Code with History
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Step 2: Cache SonarQube Scanner analyzer binaries and plugins (Eliminates download delay)
+      - name: Cache SonarQube Scanner Cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar-cache-${{ hashFiles('config/sonar-project.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-sonar-cache-
+
+      # Step 3: Run Official SonarQube Scanner CLI Action
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v4
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          projectBaseDir: .
+          args: >
+            -Dproject.settings=config/sonar-project.properties
+
+      # Step 4: Quality Gate Evaluation (Blocks merge if Clean as You Code fails)
+      # Timeout after 3 minutes to avoid hanging jobs
+      - name: SonarQube Quality Gate Check
+        uses: SonarSource/sonarqube-quality-gate-action@v1.1.0
+        timeout-minutes: 3
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
